@@ -1,37 +1,46 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function LoginScreen() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+const BASE_URL = "http://128.59.178.198/auth";
+
+export default function LoginScreen({ navigation }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://<YOUR-IP>:8080/auth/login", {
+      const res = await fetch(`${BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ email, password })
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setMessage("Login success. Token: " + data.token);
+      if (res.ok) {
+        const result = await res.json();
+
+        await AsyncStorage.setItem("token", result.token);
+        await AsyncStorage.setItem("user", JSON.stringify({ email }));
+
+        Alert.alert("Success", "Logged in successfully!");
+        navigation.replace("Meals");
       } else {
-        const err = await response.text();
-        setMessage("Login failed: " + err);
+        const error = await res.text();
+        Alert.alert("Login Failed", error);
       }
-    } catch (error) {
-      setMessage("Error: " + error.message);
+    } catch (err) {
+      Alert.alert("Error", err.message);
     }
   };
 
   return (
     <View style={styles.container}>
-      <TextInput placeholder="Username" value={username} onChangeText={setUsername} style={styles.input} />
+      <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} />
       <TextInput placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry style={styles.input} />
       <Button title="Login" onPress={handleLogin} />
-      <Text>{message}</Text>
+      <Button 
+        title="Don't have an account? Sign up" 
+        onPress={() => navigation.navigate("Signup")} />
     </View>
   );
 }

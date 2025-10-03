@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-const BASE_URL = "http://129.236.229.250:8080/menu"; 
-// Android Emulator: http://10.0.2.2:8080/menu
-// iOS Simulator: http://localhost:8080/menu
-// Physical Device: http://<your-local-ip>:8080/menu
+const BASE_URL = "http://128.59.178.198:8080/menu";
 
 export default function MealScreen({ meal }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [expandedHalls, setExpandedHalls] = useState({}); 
 
   useEffect(() => {
     fetch(`${BASE_URL}/${meal}`)
@@ -23,6 +22,13 @@ export default function MealScreen({ meal }) {
       });
   }, [meal]);
 
+  const toggleHall = (hallName) => {
+    setExpandedHalls(prev => ({
+      ...prev,
+      [hallName]: !prev[hallName],
+    }));
+  };
+
   if (loading) {
     return <ActivityIndicator style={{ flex: 1 }} size="large" color="#0000ff" />;
   }
@@ -35,20 +41,34 @@ export default function MealScreen({ meal }) {
     <FlatList
       data={data.halls}
       keyExtractor={(item, index) => item.name + index}
-      renderItem={({ item }) => (
-        <View style={styles.hallCard}>
-          <Text style={styles.hallName}>{item.name}</Text>
-          <Text style={styles.hours}>{item.hours}</Text>
-          {item.stations.map((station, idx) => (
-            <View key={idx} style={styles.stationBlock}>
-              <Text style={styles.stationName}>{station.stationName}</Text>
-              {station.items.map((food, fIdx) => (
-                <Text key={fIdx} style={styles.foodItem}>• {food}</Text>
-              ))}
-            </View>
-          ))}
-        </View>
-      )}
+      renderItem={({ item }) => {
+        const isExpanded = expandedHalls[item.name];
+        return (
+          <View style={styles.hallCard}>
+            <TouchableOpacity style={styles.hallHeader} onPress={() => toggleHall(item.name)}>
+              <Text style={styles.hallName}>{item.name}</Text>
+              <Ionicons 
+                name={isExpanded ? "chevron-up" : "chevron-down"} 
+                size={20} 
+                color="black" 
+              />
+            </TouchableOpacity>
+            {isExpanded && (
+              <View style={styles.hallContent}>
+                <Text style={styles.hours}>{item.hours}</Text>
+                {item.stations.map((station, idx) => (
+                  <View key={idx} style={styles.stationBlock}>
+                    <Text style={styles.stationName}>{station.stationName}</Text>
+                    {station.items.map((food, fIdx) => (
+                      <Text key={fIdx} style={styles.foodItem}>• {food}</Text>
+                    ))}
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        );
+      }}
     />
   );
 }
@@ -57,13 +77,23 @@ const styles = StyleSheet.create({
   hallCard: {
     backgroundColor: '#f8f8f8',
     margin: 10,
-    padding: 10,
     borderRadius: 8,
     elevation: 2,
+    overflow: 'hidden',
+  },
+  hallHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 15,
+    alignItems: 'center',
+    backgroundColor: '#e0e0e0',
   },
   hallName: {
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  hallContent: {
+    padding: 10,
   },
   hours: {
     fontSize: 14,

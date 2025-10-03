@@ -2,47 +2,48 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, Button } from 'react-native';
 
-import MealScreen from './MealScreen';
 import SignupScreen from './screens/SignupScreen';
 import LoginScreen from './screens/LoginScreen';
+import VerifyScreen from './screens/VerifyScreen';
+import MealScreen from './screens/MealScreen';
+import AccountScreen from './screens/AccountScreen';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function MainTabs() {
+function MealsTabs() {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
-      <Tab.Screen name="Breakfast">{() => <MealScreen meal="breakfast" />}</Tab.Screen>
-      <Tab.Screen name="Lunch">{() => <MealScreen meal="lunch" />}</Tab.Screen>
-      <Tab.Screen name="Dinner">{() => <MealScreen meal="dinner" />}</Tab.Screen>
-      <Tab.Screen name="Late Night">{() => <MealScreen meal="latenight" />}</Tab.Screen>
+      <Tab.Screen name="Breakfast">
+        {() => <MealScreen meal="breakfast" />}
+      </Tab.Screen>
+      <Tab.Screen name="Lunch">
+        {() => <MealScreen meal="lunch" />}
+      </Tab.Screen>
+      <Tab.Screen name="Dinner">
+        {() => <MealScreen meal="dinner" />}
+      </Tab.Screen>
+      <Tab.Screen name="Late Night">
+        {() => <MealScreen meal="latenight" />}
+      </Tab.Screen>
+        <Tab.Screen name="Account" component={AccountScreen} />
     </Tab.Navigator>
-  );
-}
-
-function LandingScreen({ navigation }) {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 20 }}>
-      <Text style={{ fontSize: 22, fontWeight: 'bold' }}>Welcome to Hungry Lion</Text>
-      <Button title="Sign Up" onPress={() => navigation.navigate('Signup')} />
-      <Button title="Login" onPress={() => navigation.navigate('Login')} />
-    </View>
   );
 }
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Landing">
-        <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} />
+      <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Signup" component={SignupScreen} />
-        <Stack.Screen name="Verify" component={VerifyScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Verify" component={VerifyScreen} />
+
         <Stack.Screen 
-          name="MainApp" 
-          component={MainTabs} 
+          name="Meals" 
+          component={MealsTabs} 
           options={{ headerShown: false }} 
         />
       </Stack.Navigator>
