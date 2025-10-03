@@ -1,117 +1,50 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View, Text, Button } from 'react-native';
 
-// Replace with your backend base URL
-const BASE_URL = "http://129.236.229.250:8080/menu"; 
-// Android Emulator: http://10.0.2.2:8080/menu
-// iOS Simulator: http://localhost:8080/menu
-// Physical Device: http://<your-local-ip>:8080/menu
+import MealScreen from './MealScreen';
+import SignupScreen from './screens/SignupScreen';
+import LoginScreen from './screens/LoginScreen';
 
-function MealScreen({ meal }) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
-  useEffect(() => {
-    fetch(`${BASE_URL}/${meal}`)
-      .then(res => res.json())
-      .then(json => {
-        setData(json);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, [meal]);
-
-  if (loading) {
-    return <ActivityIndicator style={{ flex: 1 }} size="large" color="#0000ff" />;
-  }
-
-  if (!data || !data.halls) {
-    return <Text style={styles.error}>No data available.</Text>;
-  }
-
+function MainTabs() {
   return (
-    <FlatList
-      data={data.halls}
-      keyExtractor={(item, index) => item.name + index}
-      renderItem={({ item }) => (
-        <View style={styles.hallCard}>
-          <Text style={styles.hallName}>{item.name}</Text>
-          <Text style={styles.hours}>{item.hours}</Text>
-          {item.stations.map((station, idx) => (
-            <View key={idx} style={styles.stationBlock}>
-              <Text style={styles.stationName}>{station.stationName}</Text>
-              {station.items.map((food, fIdx) => (
-                <Text key={fIdx} style={styles.foodItem}>• {food}</Text>
-              ))}
-            </View>
-          ))}
-        </View>
-      )}
-    />
+    <Tab.Navigator screenOptions={{ headerShown: false }}>
+      <Tab.Screen name="Breakfast">{() => <MealScreen meal="breakfast" />}</Tab.Screen>
+      <Tab.Screen name="Lunch">{() => <MealScreen meal="lunch" />}</Tab.Screen>
+      <Tab.Screen name="Dinner">{() => <MealScreen meal="dinner" />}</Tab.Screen>
+      <Tab.Screen name="Late Night">{() => <MealScreen meal="latenight" />}</Tab.Screen>
+    </Tab.Navigator>
   );
 }
 
-const Tab = createBottomTabNavigator();
+function LandingScreen({ navigation }) {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 20 }}>
+      <Text style={{ fontSize: 22, fontWeight: 'bold' }}>Welcome to Hungry Lion</Text>
+      <Button title="Sign Up" onPress={() => navigation.navigate('Signup')} />
+      <Button title="Login" onPress={() => navigation.navigate('Login')} />
+    </View>
+  );
+}
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Tab.Navigator screenOptions={{ headerShown: false }}>
-        <Tab.Screen name="Breakfast">
-          {() => <MealScreen meal="breakfast" />}
-        </Tab.Screen>
-        <Tab.Screen name="Lunch">
-          {() => <MealScreen meal="lunch" />}
-        </Tab.Screen>
-        <Tab.Screen name="Dinner">
-          {() => <MealScreen meal="dinner" />}
-        </Tab.Screen>
-        <Tab.Screen name="Late Night">
-          {() => <MealScreen meal="latenight" />}
-        </Tab.Screen>
-      </Tab.Navigator>
+      <Stack.Navigator initialRouteName="Landing">
+        <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Signup" component={SignupScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen 
+          name="MainApp" 
+          component={MainTabs} 
+          options={{ headerShown: false }} 
+        />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  hallCard: {
-    backgroundColor: '#f8f8f8',
-    margin: 10,
-    padding: 10,
-    borderRadius: 8,
-    elevation: 2,
-  },
-  hallName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  hours: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 5,
-  },
-  stationBlock: {
-    marginTop: 8,
-    marginLeft: 10,
-  },
-  stationName: {
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  foodItem: {
-    fontSize: 14,
-    marginLeft: 10,
-  },
-  error: {
-    flex: 1,
-    textAlign: 'center',
-    marginTop: 20,
-    color: 'red',
-  },
-});
