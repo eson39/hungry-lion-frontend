@@ -38,6 +38,7 @@ export default function App() {
       <Stack.Navigator initialRouteName="Landing">
         <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Signup" component={SignupScreen} />
+        <Stack.Screen name="Verify" component={VerifyScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen 
           name="MainApp" 
