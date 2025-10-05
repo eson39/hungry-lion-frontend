@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const BASE_URL = "http://128.59.178.198:8080/menu";
+const BASE_URL = "http://localhost:8080/menu";
 
 export default function MealScreen({ meal }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [expandedHalls, setExpandedHalls] = useState({}); 
+  const [expandedHalls, setExpandedHalls] = useState({});
 
   useEffect(() => {
     fetch(`${BASE_URL}/${meal}`)
@@ -33,13 +33,13 @@ export default function MealScreen({ meal }) {
     return <ActivityIndicator style={{ flex: 1 }} size="large" color="#0000ff" />;
   }
 
-  if (!data || !data.halls) {
+  if (!data || !data.diningHalls) {
     return <Text style={styles.error}>No data available.</Text>;
   }
 
   return (
     <FlatList
-      data={data.halls}
+      data={data.diningHalls}
       keyExtractor={(item, index) => item.name + index}
       renderItem={({ item }) => {
         const isExpanded = expandedHalls[item.name];
@@ -58,7 +58,7 @@ export default function MealScreen({ meal }) {
                 <Text style={styles.hours}>{item.hours}</Text>
                 {item.stations.map((station, idx) => (
                   <View key={idx} style={styles.stationBlock}>
-                    <Text style={styles.stationName}>{station.stationName}</Text>
+                    <Text style={styles.stationName}>{station.name}</Text>
                     {station.items.map((food, fIdx) => (
                       <Text key={fIdx} style={styles.foodItem}>• {food}</Text>
                     ))}

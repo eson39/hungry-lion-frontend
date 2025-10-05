@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 
-const BASE_URL = "http://128.59.178.198:8080/auth";
+const BASE_URL = "http://localhost:8080/auth";
 
 export default function VerifyScreen({ route, navigation }) {
   const [code, setCode] = useState("");
