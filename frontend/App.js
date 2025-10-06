@@ -17,10 +17,22 @@ const Tab = createBottomTabNavigator();
 function MealsTabs() {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
-      <Tab.Screen name="Breakfast">{() => <MealScreen meal="breakfast" />}</Tab.Screen>
-      <Tab.Screen name="Lunch">{() => <MealScreen meal="lunch" />}</Tab.Screen>
-      <Tab.Screen name="Dinner">{() => <MealScreen meal="dinner" />}</Tab.Screen>
-      <Tab.Screen name="Late Night">{() => <MealScreen meal="latenight" />}</Tab.Screen>
+      <Tab.Screen 
+        name="Breakfast"
+        children={() => <MealScreen meal="breakfast" />}
+      />
+      <Tab.Screen 
+        name="Lunch"
+        children={() => <MealScreen meal="lunch" />}
+      />
+      <Tab.Screen 
+        name="Dinner"
+        children={() => <MealScreen meal="dinner" />}
+      />
+      <Tab.Screen 
+        name="Late Night"
+        children={() => <MealScreen meal="latenight" />}
+      />
       <Tab.Screen name="Account" component={AccountScreen} />
     </Tab.Navigator>
   );
@@ -33,7 +45,9 @@ export default function App() {
   useEffect(() => {
     const checkLogin = async () => {
       const token = await AsyncStorage.getItem("token");
-      if (token) setIsLoggedIn(true);
+      if (token) {
+        setIsLoggedIn(true);
+      }
       setIsLoading(false);
     };
     checkLogin();
@@ -53,7 +67,11 @@ export default function App() {
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Verify" component={VerifyScreen} />
-        <Stack.Screen name="Meals" component={MealsTabs} options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="Meals" 
+          component={MealsTabs} 
+          options={{ headerShown: false }} 
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
